@@ -124,7 +124,7 @@ protected:
 TEST_F(TestNamedReferences, SaveLoad)
 {
     vmf::MetadataStream newStream;
-    newStream.open(TEST_FILE, vmf::MetadataStream::ReadOnly);
+    newStream.open(TEST_FILE, vmf::MetadataStream::OpenMode::ReadWrite);
     newStream.load();
 
     auto md = newStream.getAll();
@@ -146,6 +146,8 @@ TEST_F(TestNamedReferences, SaveLoad)
     EXPECT_EQ(2, refs.size());
 
     newStream.save();
+    newStream.close();
+    newStream.reopen(vmf::MetadataStream::OpenMode::ReadOnly);
     newStream.load();
 
     refs = md[0]->getAllReferences();
@@ -160,7 +162,7 @@ TEST_F(TestNamedReferences, SaveLoad)
 TEST_F(TestNamedReferences, AddReferences)
 {
     vmf::MetadataStream newStream;
-    newStream.open(TEST_FILE, vmf::MetadataStream::ReadOnly);
+    newStream.open(TEST_FILE, vmf::MetadataStream::ReadWrite);
     newStream.load();
 
     auto md = newStream.getAll();
@@ -208,6 +210,8 @@ TEST_F(TestNamedReferences, AddReferences)
     EXPECT_EQ(2, mdSet.size());
 
     newStream.save();
+    newStream.close();
+    newStream.reopen(vmf::MetadataStream::OpenMode::ReadOnly);
     newStream.load();
     refs = md[0]->getAllReferences();
     EXPECT_EQ(6, refs.size());
@@ -631,7 +635,7 @@ TEST_F(TestSaveLoadReference, NonSimpleReferencesOrder)
         ASSERT_EQ(item2->getFirstReference(TEST_DESC_NAME_1)->getId(), 5);
         ASSERT_EQ(item5->getFirstReference(TEST_DESC_NAME_1)->getId(), 4);
 
-        ASSERT_TRUE(stream.save());
+        ASSERT_NO_THROW(stream.save());
 
         stream.close();
     }

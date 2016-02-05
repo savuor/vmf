@@ -141,17 +141,15 @@ public:
 
     /*!
     * \brief Save loaded data to media file
-    * \return Save operation result
     */
-    bool save();
+    void save();
 
 
     /*!
     * \brief Save the in-memory metadata to a different video file.
     * \param sFilePath the path of the new file.
-    * \return true if succeed.
     */
-    bool saveTo( const std::string& sFilePath );
+    void saveTo( const std::string& sFilePath );
 
 
     /*!

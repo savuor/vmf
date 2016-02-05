@@ -728,7 +728,7 @@ TEST_F(TestSaveLoadMetadata, DeleteProperty)
         anotherMd->addValue(vmf::Variant(TEST_VALUE_2));
         stream.add(md);
         stream.add(anotherMd);
-        ASSERT_TRUE(stream.save());
+        ASSERT_NO_THROW(stream.save());
         stream.close();
     }
 
@@ -741,7 +741,7 @@ TEST_F(TestSaveLoadMetadata, DeleteProperty)
         vmf::MetadataSet descSet = schemaSet.queryByName(TEST_DESC_NAME);
         ASSERT_EQ(1, descSet.size());
         stream.remove(descSet);
-        ASSERT_TRUE(stream.save());
+        ASSERT_NO_THROW(stream.save());
         stream.close();
     }
 

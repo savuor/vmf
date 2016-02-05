@@ -104,53 +104,44 @@ bool MetadataStream::load(const std::string& sSchemaName, const std::string& sMe
     }
 }
 
-bool MetadataStream::save()
+void MetadataStream::save()
 {
     dataSourceCheck();
-    try
+    if( m_eMode == ReadWrite && !m_sFilePath.empty() )
     {
-        if( m_eMode == ReadWrite && !m_sFilePath.empty() )
+        dataSource->remove(removedIds);
+        removedIds.clear();
+
+        for(auto& schemaPtr : removedSchemas)
         {
-            dataSource->remove(removedIds);
-            removedIds.clear();
-
-            for(auto& schemaPtr : removedSchemas)
+            dataSource->removeSchema(schemaPtr.first);
+            // Empty schema name is used to delete all schemas in the file
+            // That's why there's no need to continue the loop
+            if(schemaPtr.first == "")
             {
-                dataSource->removeSchema(schemaPtr.first);
-                // Empty schema name is used to delete all schemas in the file
-                // That's why there's no need to continue the loop
-                if(schemaPtr.first == "")
-                {
-                    break;
-                }
+                break;
             }
-            removedSchemas.clear();
-
-            for(auto& p : m_mapSchemas)
-            {
-                dataSource->saveSchema(p.first, *this);
-                dataSource->save(p.second);
-            }
-
-            dataSource->saveVideoSegments(videoSegments);
-
-            dataSource->save(nextId);
-
-            if(!m_sChecksumMedia.empty())
-                dataSource->saveChecksum(m_sChecksumMedia);
-
-            addedIds.clear();
-
-            return true;
         }
-        else
+        removedSchemas.clear();
+
+        for(auto& p : m_mapSchemas)
         {
-            return false;
+            dataSource->saveSchema(p.first, *this);
+            dataSource->save(p.second);
         }
+
+        dataSource->saveVideoSegments(videoSegments);
+
+        dataSource->save(nextId);
+
+        if(!m_sChecksumMedia.empty())
+            dataSource->saveChecksum(m_sChecksumMedia);
+
+        addedIds.clear();
     }
-    catch (...)
+    else
     {
-        return false;
+        VMF_EXCEPTION(vmf::IncorrectParamException, "The previous file has not been closed!");
     }
 }
 
@@ -175,40 +166,30 @@ bool MetadataStream::reopen( OpenMode eMode )
     return false;
 }
 
-bool MetadataStream::saveTo( const std::string& sFilePath )
+void MetadataStream::saveTo( const std::string& sFilePath )
 {
     if( m_eMode != InMemory )
-        throw std::runtime_error("The previous file has not been closed!");
-    try
+        VMF_EXCEPTION(IncorrectParamException, "The previous file has not been closed!");
+    std::shared_ptr<IDataSource> oldDataSource = dataSource;
+    dataSource = ObjectFactory::getInstance()->getDataSource();
+    if (!dataSource)
     {
-        std::shared_ptr<IDataSource> oldDataSource = dataSource;
-        dataSource = ObjectFactory::getInstance()->getDataSource();
-        if (!dataSource)
-        {
-            dataSource = oldDataSource;
-            return false;
-        }
-
-        // Change file path to make reopen() happy
-        m_sFilePath = sFilePath;
-
-        bool bRet = false;
-
-        // Do not load anything from the file by calling reopen()
-        if( this->reopen( ReadWrite ) )
-        {
-            dataSource->clear();
-            bRet = this->save();
-        }
-        dataSource->closeFile();
-
         dataSource = oldDataSource;
-        return bRet;
+        VMF_EXCEPTION(InternalErrorException, "No datasource provided");
     }
-    catch (const DataStorageException& /* unused */)
+
+    // Change file path to make reopen() happy
+    m_sFilePath = sFilePath;
+
+    // Do not load anything from the file by calling reopen()
+    if( this->reopen( ReadWrite ) )
     {
-        return false;
+        dataSource->clear();
+        this->save();
     }
+    dataSource->closeFile();
+
+    dataSource = oldDataSource;
 }
 
 void MetadataStream::close()

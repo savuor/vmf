@@ -75,7 +75,7 @@ TEST_F(TestGlobal, Reopen)
     ASSERT_TRUE(stream.reopen(vmf::MetadataStream::ReadWrite));
     stream.load();
     ASSERT_EQ(1, stream.getAll().size());
-    ASSERT_TRUE(stream.save());
+    ASSERT_NO_THROW(stream.save());
     stream.close();
 }
 
@@ -192,7 +192,7 @@ TEST_F(TestGlobal, NoDestinationReference)
         metadata2->setFieldValue("age", (vmf::vmf_integer) 22);
         EXPECT_THROW(metadata1->addReference(metadata2), vmf::IncorrectParamException);
     }
-    EXPECT_TRUE(stream.saveTo(TEST_FILE));
+    ASSERT_NO_THROW(stream.saveTo(TEST_FILE));
 
     vmf::MetadataStream stream2;
     stream2.open(TEST_FILE);
