@@ -372,6 +372,9 @@ private:
 
 };
 
+
+void printTree(const XMP_Node &node, std::string spaces);
+
 class XMP_AutoNode {	// Used to hold a child during subtree construction.
 public:
 	XMP_Node * nodePtr;

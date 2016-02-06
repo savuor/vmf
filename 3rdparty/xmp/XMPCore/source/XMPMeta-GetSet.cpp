@@ -367,6 +367,12 @@ XMPMeta::GetProperty ( XMP_StringPtr	schemaNS,
 					   XMP_StringLen *	valueSize,
 					   XMP_OptionBits *	options ) const
 {
+    bool print = false;
+    if(print)
+    {
+        printTree(tree, "");
+    }
+
 	XMP_Assert ( (schemaNS != 0) && (propName != 0) );	// Enforced by wrapper.
 	XMP_Assert ( (propValue != 0) && (valueSize != 0) && (options != 0) );	// Enforced by wrapper.
 
@@ -470,6 +476,11 @@ XMPMeta::SetProperty ( XMP_StringPtr  schemaNS,
 					   XMP_OptionBits options )
 {
 	XMP_Assert ( (schemaNS != 0) && (propName != 0) );	// Enforced by wrapper.
+    bool print = false;
+    if(print)
+    {
+        printTree(tree, "");
+    }
 
 	options = VerifySetOptions ( options, propValue );
 

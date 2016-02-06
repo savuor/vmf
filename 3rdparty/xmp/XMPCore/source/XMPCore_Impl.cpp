@@ -1411,4 +1411,23 @@ SortNamedNodes ( XMP_NodeOffspring & nodeVector )
 	sort ( nodeVector.begin(), nodeVector.end(), Compare );
 }	// SortNamedNodes
 
+void printTree(const XMP_Node &node, std::string spaces)
+{
+    std::cout << spaces << "--node start--" << std::endl;
+    std::cout << spaces << "options: " << node.options << std::endl;
+    std::cout << spaces << "name: " << node.name << std::endl;
+    std::cout << spaces << "value: " << node.value << std::endl;
+    for(auto c : node.children)
+    {
+        std::cout << spaces << "child:" << std::endl;
+        printTree(*c, spaces+" ");
+    }
+    for(auto c : node.qualifiers)
+    {
+        std::cout << spaces << "qualifier:" << std::endl;
+        printTree(*c, spaces+" ");
+    }
+    std::cout << spaces << "--node end--" << std::endl;
+}
+
 // =================================================================================================

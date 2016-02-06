@@ -109,8 +109,11 @@ void MetadataStream::save()
     dataSourceCheck();
     if( m_eMode == ReadWrite && !m_sFilePath.empty() )
     {
-        dataSource->remove(removedIds);
-        removedIds.clear();
+        if(!removedIds.empty())
+        {
+            dataSource->remove(removedIds);
+            removedIds.clear();
+        }
 
         for(auto& schemaPtr : removedSchemas)
         {

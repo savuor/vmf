@@ -115,6 +115,7 @@ void XMPMetadataSource::saveProperty(const MetadataSet& property, const MetaStri
     }
 
     savePropertyName(thisPropertyPath, propertyName);
+    //////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     xmp->SetStructField(VMF_NS, thisPropertyPath.c_str(), VMF_NS, PROPERTY_SET, nullptr, kXMP_PropValueIsArray);
     MetaString thisPropertySetPath;
     SXMPUtils::ComposeStructFieldPath(VMF_NS, thisPropertyPath.c_str(), VMF_NS, PROPERTY_SET, &thisPropertySetPath);
@@ -188,6 +189,11 @@ void XMPMetadataSource::loadSchema(const MetaString &schemaName, MetadataStream 
 void XMPMetadataSource::loadProperty(const MetaString& schemaName, const MetaString& metadataName, MetadataStream& stream)
 {
     MetaString pathToSchema = findSchema(schemaName);
+    if (pathToSchema.empty())
+    {
+        VMF_EXCEPTION(DataStorageException, "Schema " + schemaName + " not found");
+    }
+
     MetaString pathToProperty = findProperty(pathToSchema, metadataName);
     loadPropertyByPath(pathToProperty, schemaName, stream);
 }
